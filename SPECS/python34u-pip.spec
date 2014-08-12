@@ -12,7 +12,7 @@
 
 Name:           python%{iusver}-%{srcname}
 Version:        1.5.6
-Release:        1.ius%{?dist}
+Release:        2.ius%{?dist}
 Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
 License:        MIT
@@ -72,6 +72,10 @@ pip%{pyver} install --ignore-installed dist/%{python3_wheelname} --root %{buildr
 
 
 %changelog
+* Tue Aug 12 2014 Carl George <carl.george@rackspace.com> - 1.5.6-2.ius
+- Port from Fedora to IUS
+- Update Patch0 for latest source
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
