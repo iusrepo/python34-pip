@@ -1,39 +1,32 @@
-%if (! 0%{?rhel}) || 0%{?rhel} > 6
-%global with_python3 1
-%global build_wheel 1
-%endif
-%if 0%{?rhel} && 0%{?rhel} < 6
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%endif
-
+%global pymajor 3
+%global pyminor 4
+%global pyver %{pymajor}.%{pyminor}
+%global iusver %{pymajor}%{pyminor}u
+%global build_wheel 0
 %global srcname pip
+%global src %(echo %{srcname} | cut -c1)
+
 %if 0%{?build_wheel}
-%global python2_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
-%if 0%{?with_python3}
-%global python3_wheelname %python2_wheelname
-%endif
+%global python3_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
 %endif
 
-Name:           python-%{srcname}
+Name:           python%{iusver}-%{srcname}
 Version:        1.5.6
-Release:        2%{?dist}
-Summary:        A tool for installing and managing Python packages
-
+Release:        1.ius%{?dist}
+Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
 License:        MIT
-URL:            http://www.pip-installer.org
-Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+URL:            https://pip.pypa.io
+Source0:        https://pypi.python.org/packages/source/%{src}/%{srcname}/%{srcname}-%{version}.tar.gz
 Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 BuildArch:      noarch
-BuildRequires:  python-devel
-BuildRequires:  python-setuptools
+BuildRequires:  python%{iusver}-devel
+BuildRequires:  python%{iusver}-setuptools
 %if 0%{?build_wheel}
-BuildRequires:  python-pip
-BuildRequires:  python-wheel
+BuildRequires:  python%{iusver}-pip
+BuildRequires:  python%{iusver}-wheel
 %endif
-Requires:       python-setuptools
+Requires:       python%{iusver}-setuptools
 
 %description
 Pip is a replacement for `easy_install
@@ -42,98 +35,41 @@ same techniques for finding packages, so packages that were made
 easy_installable should be pip-installable as well.
 
 
-%if 0%{?with_python3}
-%package -n python3-pip
-Summary:        A tool for installing and managing Python3 packages
-Group:          Development/Libraries
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if 0%{?build_wheel}
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-%endif
-Requires:  python3-setuptools
-
-%description -n python3-pip
-Pip is a replacement for `easy_install
-<http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
-same techniques for finding packages, so packages that were made
-easy_installable should be pip-installable as well.
-%endif # with_python3
-
 %prep
 %setup -q -n %{srcname}-%{version}
-
 %patch0 -p1
-
-%{__sed} -i '1d' pip/__init__.py
-
-%if 0%{?with_python3}
-cp -a . %{py3dir}
-%endif # with_python3
+# fix shebangs
+find -name '*.py' -type f -print0 | xargs -0 sed -i '1s|python|&%{pyver}|'
 
 
 %build
-%if 0%{?build_wheel}
-%{__python} setup.py bdist_wheel
-%else
-%{__python} setup.py build
-%endif
-
-%if 0%{?with_python3}
-pushd %{py3dir}
 %if 0%{?build_wheel}
 %{__python3} setup.py bdist_wheel
 %else
 %{__python3} setup.py build
 %endif
-popd
-%endif # with_python3
 
 
 %install
-%{__rm} -rf %{buildroot}
-
-%if 0%{?with_python3}
-pushd %{py3dir}
 %if 0%{?build_wheel}
-pip3 install -I dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
-# TODO: we have to remove this by hand now, but it'd be nice if we wouldn't have to
-# (pip install wheel doesn't overwrite)
-rm %{buildroot}%{_bindir}/pip
+pip%{pyver} install --ignore-installed dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
 %else
-%{__python3} setup.py install --skip-build --root %{buildroot}
+%{__python3} setup.py install --optimize 1 --skip-build --root %{buildroot}
 %endif
-%endif # with_python3
+%{__rm} -f %{buildroot}%{_bindir}/pip
 
-%if 0%{?build_wheel}
-pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
-%else
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
-%endif
-
-
-%clean
-%{__rm} -rf %{buildroot}
 
 # unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
 # fedora yet. Once it is, check can be implemented
+# tests_require = ['pytest', 'virtualenv>=1.10', 'scripttest>=1.3', 'mock']
+
 
 %files
-%defattr(-,root,root,-)
 %doc LICENSE.txt README.rst docs
-%attr(755,root,root) %{_bindir}/pip
-%attr(755,root,root) %{_bindir}/pip2*
-%{python_sitelib}/pip*
-
-%if 0%{?with_python3}
-%files -n python3-pip
-%defattr(-,root,root,-)
-%doc LICENSE.txt README.rst docs
-%attr(755,root,root) %{_bindir}/pip3*
+%{_bindir}/pip3
+%{_bindir}/pip3.4
 %{python3_sitelib}/pip*
-%endif # with_python3
+
 
 %changelog
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.6-2
