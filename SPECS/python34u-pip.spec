@@ -18,7 +18,7 @@ Group:          Development/Libraries
 License:        MIT
 URL:            https://pip.pypa.io
 Source0:        https://pypi.python.org/packages/source/%{src}/%{srcname}/%{srcname}-%{version}.tar.gz
-Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
+Patch0:         allow-stripping-prefix-from-wheel-RECORD-files.patch
 BuildArch:      noarch
 BuildRequires:  python%{iusver}-devel
 BuildRequires:  python%{iusver}-setuptools
