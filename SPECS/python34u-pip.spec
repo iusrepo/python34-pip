@@ -2,7 +2,7 @@
 %global pyminor 4
 %global pyver %{pymajor}.%{pyminor}
 %global iusver %{pymajor}%{pyminor}u
-%global build_wheel 0
+%global build_wheel 1
 %global srcname pip
 %global src %(echo %{srcname} | cut -c1)
 
@@ -13,7 +13,7 @@
 
 Name:           python%{iusver}-%{srcname}
 Version:        1.5.6
-Release:        2.ius%{?dist}
+Release:        3.ius%{?dist}
 Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
 License:        MIT
@@ -77,6 +77,10 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 %changelog
+* Wed Aug 13 2014 Carl George <carl.george@rackspace.com> - 1.5.6-3.ius
+- Make pip3 a symlink to pip3.4
+- Enable wheel
+
 * Tue Aug 12 2014 Carl George <carl.george@rackspace.com> - 1.5.6-2.ius
 - Port from Fedora to IUS
 - Update Patch0 for latest source
