@@ -10,6 +10,7 @@
 %global python3_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
 %endif
 
+
 Name:           python%{iusver}-%{srcname}
 Version:        1.5.6
 Release:        2.ius%{?dist}
@@ -27,6 +28,7 @@ BuildRequires:  python%{iusver}-pip
 BuildRequires:  python%{iusver}-wheel
 %endif
 Requires:       python%{iusver}-setuptools
+
 
 %description
 Pip is a replacement for `easy_install
@@ -56,7 +58,10 @@ pip%{pyver} install --ignore-installed dist/%{python3_wheelname} --root %{buildr
 %else
 %{__python3} setup.py install --optimize 1 --skip-build --root %{buildroot}
 %endif
-%{__rm} -f %{buildroot}%{_bindir}/pip
+# leave pip3.4, remove pip and pip3, make pip3 a symlink to pip3.4
+%{__rm} -f %{buildroot}%{_bindir}/%{srcname}
+%{__rm} -f %{buildroot}%{_bindir}/%{srcname}%{pymajor}
+ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 # unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
@@ -66,9 +71,9 @@ pip%{pyver} install --ignore-installed dist/%{python3_wheelname} --root %{buildr
 
 %files
 %doc LICENSE.txt README.rst docs
-%{_bindir}/pip3
-%{_bindir}/pip3.4
-%{python3_sitelib}/pip*
+%{_bindir}/%{srcname}%{pymajor}
+%{_bindir}/%{srcname}%{pyver}
+%{python3_sitelib}/%{srcname}*
 
 
 %changelog
