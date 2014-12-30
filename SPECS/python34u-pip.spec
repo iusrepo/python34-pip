@@ -12,8 +12,8 @@
 
 
 Name:           python%{iusver}-%{srcname}
-Version:        1.5.6
-Release:        3.ius%{?dist}
+Version:        6.0.3
+Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
 License:        MIT
@@ -77,6 +77,10 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 %changelog
+* Fri Dec 26 2014 Carl George <carl.george@rackspace.com> - 6.0.3-1.ius
+- Latest upstream
+- Refresh patch0
+
 * Wed Aug 13 2014 Carl George <carl.george@rackspace.com> - 1.5.6-3.ius
 - Make pip3 a symlink to pip3.4
 - Enable wheel
