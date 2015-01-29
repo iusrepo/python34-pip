@@ -2,9 +2,9 @@
 %global pyminor 4
 %global pyver %{pymajor}.%{pyminor}
 %global iusver %{pymajor}%{pyminor}u
-%global build_wheel 1
 %global srcname pip
 %global src %(echo %{srcname} | cut -c1)
+%global build_wheel 1
 
 %if 0%{?build_wheel}
 %global python3_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
@@ -40,7 +40,6 @@ easy_installable should be pip-installable as well.
 %prep
 %setup -q -n %{srcname}-%{version}
 %patch0 -p1
-# fix shebangs
 find -name '*.py' -type f -print0 | xargs -0 sed -i '1s|python|&%{pyver}|'
 
 
@@ -54,19 +53,21 @@ find -name '*.py' -type f -print0 | xargs -0 sed -i '1s|python|&%{pyver}|'
 
 %install
 %if 0%{?build_wheel}
-pip%{pyver} install --ignore-installed dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+pip%{pyver} install \
+    --root %{buildroot} \
+    --ignore-installed dist/%{python3_wheelname} \
+    --strip-file-prefix %{buildroot}
 %else
-%{__python3} setup.py install --optimize 1 --skip-build --root %{buildroot}
+%{__python3} setup.py install \
+    --root %{buildroot} \
+    --optimize 1 \
+    --skip-build
 %endif
-# leave pip3.4, remove pip and pip3, make pip3 a symlink to pip3.4
+# delete pip and pip3
 %{__rm} -f %{buildroot}%{_bindir}/%{srcname}
 %{__rm} -f %{buildroot}%{_bindir}/%{srcname}%{pymajor}
+# symlink pip3 to pip3.4
 ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
-
-
-# unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
-# fedora yet. Once it is, check can be implemented
-# tests_require = ['pytest', 'virtualenv>=1.10', 'scripttest>=1.3', 'mock']
 
 
 %files
