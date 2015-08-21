@@ -12,7 +12,7 @@
 
 
 Name:           python%{iusver}-%{srcname}
-Version:        7.1.0
+Version:        7.1.1
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
@@ -78,6 +78,9 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 %changelog
+* Fri Aug 21 2015 Ben Harper <ben.harper@rackspace.com> - 7.1.1-1.ius
+- Latest upstream
+
 * Thu Jul 02 2015 Ben Harper <ben.harper@rackspace.com> - 7.1.0-1.ius
 - Latest upstream
 
