@@ -12,8 +12,8 @@
 
 
 Name:           python%{iusver}-%{srcname}
-Version:        8.0.1
-Release:        2.ius%{?dist}
+Version:        8.0.2
+Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python %{pyver} packages
 Group:          Development/Libraries
 License:        MIT
@@ -78,6 +78,9 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 %changelog
+* Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
+- Latest upstream
+
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.1-2.ius
 - correct patch0
 
