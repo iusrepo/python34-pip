@@ -1,24 +1,20 @@
-%global pymajor 3
-%global pyminor 4
-%global pyver %{pymajor}.%{pyminor}
-%global iusver %{pymajor}%{pyminor}u
 %global srcname pip
-%global src %(echo %{srcname} | cut -c1)
 
 
+%global ius_suffix 34u
 
-Name:           python%{iusver}-%{srcname}
+Name:           python%{ius_suffix}-%{srcname}
 Version:        8.1.0
 Release:        1.ius%{?dist}
-Summary:        A tool for installing and managing Python %{pyver} packages
+Summary:        A tool for installing and managing Python packages
 Group:          Development/Libraries
 License:        MIT
 URL:            https://pip.pypa.io
-Source0:        https://pypi.python.org/packages/source/%{src}/%{srcname}/%{srcname}-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  python%{iusver}-devel
-BuildRequires:  python%{iusver}-setuptools
-Requires:       python%{iusver}-setuptools
+BuildRequires:  python%{ius_suffix}-devel
+BuildRequires:  python%{ius_suffix}-setuptools
+Requires:       python%{ius_suffix}-setuptools
 
 
 %description
@@ -44,19 +40,19 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
     --skip-build
 
 # delete pip and pip3
-%{__rm} -f %{buildroot}%{_bindir}/%{srcname}
-%{__rm} -f %{buildroot}%{_bindir}/%{srcname}%{pymajor}
+%{__rm} -f %{buildroot}%{_bindir}/pip
+%{__rm} -f %{buildroot}%{_bindir}/pip3
 # symlink pip3 to pip3.4
-ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
+ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}3
 
 
 %files
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
-%{_bindir}/%{srcname}%{pymajor}
-%{_bindir}/%{srcname}%{pyver}
-%{python3_sitelib}/%{srcname}*
+%{_bindir}/pip3
+%{_bindir}/pip%{python3_version}
+%{python3_sitelib}/pip*
 
 
 %changelog
@@ -65,6 +61,7 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 - Remove build_wheel
 - Strip shebangs
 - Use %%license when possible
+- Macro clean up
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
