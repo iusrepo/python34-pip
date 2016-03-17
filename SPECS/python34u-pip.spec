@@ -4,11 +4,7 @@
 %global iusver %{pymajor}%{pyminor}u
 %global srcname pip
 %global src %(echo %{srcname} | cut -c1)
-%global build_wheel 1
 
-%if 0%{?build_wheel}
-%global python3_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
-%endif
 
 
 Name:           python%{iusver}-%{srcname}
@@ -19,14 +15,9 @@ Group:          Development/Libraries
 License:        MIT
 URL:            https://pip.pypa.io
 Source0:        https://pypi.python.org/packages/source/%{src}/%{srcname}/%{srcname}-%{version}.tar.gz
-Patch0:         allow-stripping-prefix-from-wheel-RECORD-files.patch
 BuildArch:      noarch
 BuildRequires:  python%{iusver}-devel
 BuildRequires:  python%{iusver}-setuptools
-%if 0%{?build_wheel}
-BuildRequires:  python%{iusver}-pip
-BuildRequires:  python%{iusver}-wheel
-%endif
 Requires:       python%{iusver}-setuptools
 
 
@@ -39,30 +30,19 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p1
 find -name '*.py' -type f -print0 | xargs -0 sed -i '1s|python|&%{pyver}|'
 
 
 %build
-%if 0%{?build_wheel}
-%{__python3} setup.py bdist_wheel
-%else
 %{__python3} setup.py build
-%endif
 
 
 %install
-%if 0%{?build_wheel}
-pip%{pyver} install \
-    --root %{buildroot} \
-    --ignore-installed dist/%{python3_wheelname} \
-    --strip-file-prefix %{buildroot}
-%else
 %{__python3} setup.py install \
     --root %{buildroot} \
     --optimize 1 \
     --skip-build
-%endif
+
 # delete pip and pip3
 %{__rm} -f %{buildroot}%{_bindir}/%{srcname}
 %{__rm} -f %{buildroot}%{_bindir}/%{srcname}%{pymajor}
@@ -80,6 +60,7 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 %changelog
 * Thu Mar 17 2016 Carl George <carl.george@rackspace.com> - 8.1.0-1.ius
 - Latest upstream
+- Remove build_wheel
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
