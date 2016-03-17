@@ -30,7 +30,7 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-find -name '*.py' -type f -print0 | xargs -0 sed -i '1s|python|&%{pyver}|'
+find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 
 
 %build
@@ -61,6 +61,7 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 * Thu Mar 17 2016 Carl George <carl.george@rackspace.com> - 8.1.0-1.ius
 - Latest upstream
 - Remove build_wheel
+- Strip shebangs
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
