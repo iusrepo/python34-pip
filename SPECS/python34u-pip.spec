@@ -51,7 +51,9 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 
 
 %files
-%doc LICENSE.txt README.rst docs
+%{!?_licensedir:%global license %%doc}
+%license LICENSE.txt
+%doc README.rst docs
 %{_bindir}/%{srcname}%{pymajor}
 %{_bindir}/%{srcname}%{pyver}
 %{python3_sitelib}/%{srcname}*
@@ -62,6 +64,7 @@ ln -sf %{_bindir}/%{srcname}%{pyver} %{buildroot}%{_bindir}/%{srcname}%{pymajor}
 - Latest upstream
 - Remove build_wheel
 - Strip shebangs
+- Use %%license when possible
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
