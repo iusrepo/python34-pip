@@ -1,5 +1,9 @@
 %global srcname pip
 
+%global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
+%if "%{bashcompdir}" != "%{_sysconfdir}/bash_completion.d"
+%global bashcomp2 1
+%endif
 
 %global ius_suffix 34u
 
@@ -12,6 +16,7 @@ License:        MIT
 URL:            https://pip.pypa.io
 Source0:        https://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  bash-completion
 BuildRequires:  python%{ius_suffix}-devel
 BuildRequires:  python%{ius_suffix}-setuptools
 Requires:       python%{ius_suffix}-setuptools
@@ -45,6 +50,13 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 # symlink pip3 to pip3.4
 ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}3
 
+mkdir -p %{buildroot}%{bashcompdir}
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    %{buildroot}%{_bindir}/pip%{python3_version} completion --bash \
+    > %{buildroot}%{bashcompdir}/pip%{python3_version}
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
+    %{buildroot}%{bashcompdir}/pip%{python3_version}
+
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -53,6 +65,10 @@ ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}
 %{_bindir}/pip3
 %{_bindir}/pip%{python3_version}
 %{python3_sitelib}/pip*
+%{bashcompdir}
+%if 0%{?bashcomp2}
+%dir %(dirname %{bashcompdir})
+%endif
 
 
 %changelog
@@ -62,6 +78,7 @@ ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}
 - Strip shebangs
 - Use %%license when possible
 - Macro clean up
+- Import bash-completion from Fedora
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
