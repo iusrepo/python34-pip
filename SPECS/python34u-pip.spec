@@ -62,8 +62,8 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
-%{_bindir}/pip3
-%{_bindir}/pip%{python3_version}
+%attr(755,root,root) %{_bindir}/pip3
+%attr(755,root,root) %{_bindir}/pip%{python3_version}
 %{python3_sitelib}/pip*
 %{bashcompdir}
 %if 0%{?bashcomp2}
@@ -79,6 +79,7 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
 - Use %%license when possible
 - Macro clean up
 - Import bash-completion from Fedora
+- Ensure commands are executable
 
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
