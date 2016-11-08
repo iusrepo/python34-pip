@@ -8,7 +8,7 @@
 %global ius_suffix 34u
 
 Name:           python%{ius_suffix}-%{srcname}
-Version:        8.1.2
+Version:        9.0.1
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 Group:          Development/Libraries
@@ -72,6 +72,9 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
 
 
 %changelog
+* Tue Nov 08 2016 Ben Harper <ben.harper@rackspace.com> - 9.0.1.-1.ius
+- Latest upstream
+
 * Mon May 23 2016 Carl George <carl.george@rackspace.com> - 8.1.2-1.ius
 - Latest upstream
 
