@@ -1,10 +1,5 @@
 %global srcname pip
 
-%global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
-%if "%{bashcompdir}" != "%{_sysconfdir}/bash_completion.d"
-%global bashcomp2 1
-%endif
-
 Name:           python34-%{srcname}
 Version:        9.0.1
 Release:        2%{?dist}
@@ -14,7 +9,6 @@ License:        MIT
 URL:            https://pip.pypa.io
 Source0:        https://pypi.io/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  bash-completion
 BuildRequires:  python34-devel
 BuildRequires:  python34-setuptools
 Requires:       python34-setuptools
@@ -52,25 +46,23 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 # symlink pip3 to pip3.4
 ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}3
 
-mkdir -p %{buildroot}%{bashcompdir}
+mkdir -p %{buildroot}%{bash_completion_dir}
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     %{buildroot}%{_bindir}/pip%{python3_version} completion --bash \
-    > %{buildroot}%{bashcompdir}/pip%{python3_version}
+    > %{buildroot}%{bash_completion_dir}/pip%{python3_version}
 sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
-    %{buildroot}%{bashcompdir}/pip%{python3_version}
+    %{buildroot}%{bash_completion_dir}/pip%{python3_version}
 
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
 %attr(755,root,root) %{_bindir}/pip3
 %attr(755,root,root) %{_bindir}/pip%{python3_version}
 %{python3_sitelib}/pip*
-%{bashcompdir}
-%if 0%{?bashcomp2}
-%dir %(dirname %{bashcompdir})
-%endif
+%dir %{_datadir}/bash-completion
+%dir %{bash_completion_dir}
+%{bash_completion_dir}/pip%{python3_version}
 
 
 %changelog
