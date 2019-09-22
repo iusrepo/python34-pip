@@ -5,11 +5,9 @@
 %global bashcomp2 1
 %endif
 
-%global ius_suffix 34u
-
-Name:           python%{ius_suffix}-%{srcname}
+Name:           python34-%{srcname}
 Version:        9.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 Group:          Development/Libraries
 License:        MIT
@@ -17,9 +15,13 @@ URL:            https://pip.pypa.io
 Source0:        https://pypi.io/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  bash-completion
-BuildRequires:  python%{ius_suffix}-devel
-BuildRequires:  python%{ius_suffix}-setuptools
-Requires:       python%{ius_suffix}-setuptools
+BuildRequires:  python34-devel
+BuildRequires:  python34-setuptools
+Requires:       python34-setuptools
+
+# Rename from python36u-pip
+Provides:       python34u-pip = %{version}-%{release}
+Obsoletes:      python34u-pip < 9.0.1-2
 
 
 %description
@@ -72,6 +74,9 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
 
 
 %changelog
+* Sun Sep 22 2019 Carl George <carl@george.computer> - 9.0.1-2
+- Rename to python34-pip
+
 * Tue Nov 08 2016 Ben Harper <ben.harper@rackspace.com> - 9.0.1.-1.ius
 - Latest upstream
 
