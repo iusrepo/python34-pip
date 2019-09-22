@@ -1,5 +1,9 @@
 %global srcname pip
 
+%if %{undefined el6}
+%global __python3 /usr/bin/python3.4
+%endif
+
 Name:           python34-%{srcname}
 Version:        9.0.1
 Release:        2%{?dist}
@@ -7,8 +11,9 @@ Summary:        A tool for installing and managing Python packages
 Group:          Development/Libraries
 License:        MIT
 URL:            https://pip.pypa.io
-Source0:        https://pypi.io/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+Source0:        %pypi_source
 BuildArch:      noarch
+BuildRequires:  python3-rpm-macros
 BuildRequires:  python34-devel
 BuildRequires:  python34-setuptools
 Requires:       python34-setuptools
@@ -31,43 +36,58 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 
 
 %build
-%{__python3} setup.py build
+%py3_build
 
 
 %install
-%{__python3} setup.py install \
-    --root %{buildroot} \
-    --optimize 1 \
-    --skip-build
-
-# delete pip and pip3
-%{__rm} -f %{buildroot}%{_bindir}/pip
-%{__rm} -f %{buildroot}%{_bindir}/pip3
-# symlink pip3 to pip3.4
-ln -sf %{_bindir}/%{srcname}%{python3_version} %{buildroot}%{_bindir}/%{srcname}3
+%py3_install
+rm %{buildroot}%{_bindir}/pip
+%if %{undefined el6}
+rm %{buildroot}%{_bindir}/pip3
+%endif
 
 mkdir -p %{buildroot}%{bash_completion_dir}
+
+%if %{defined el6}
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    %{buildroot}%{_bindir}/pip3 completion --bash \
+    > %{buildroot}%{bash_completion_dir}/pip3
+ln -s pip3 %{buildroot}%{bash_completion_dir}/pip%{python3_version}
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip3 pip%{python3_version}/" \
+    -e s/_pip_completion/_pip3_completion/ \
+    %{buildroot}%{bash_completion_dir}/pip3
+%else
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     %{buildroot}%{_bindir}/pip%{python3_version} completion --bash \
-    > %{buildroot}%{bash_completion_dir}/pip%{python3_version}
+    > %{buildroot}%{bash_completion_dir}/pip3
+mv %{buildroot}%{bash_completion_dir}/pip{3,%{python3_version}}
 sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
+    -e s/_pip_completion/_pip%{python3_version_nodots}_completion/ \
     %{buildroot}%{bash_completion_dir}/pip%{python3_version}
+%endif
 
 
 %files
 %license LICENSE.txt
 %doc README.rst docs
-%attr(755,root,root) %{_bindir}/pip3
-%attr(755,root,root) %{_bindir}/pip%{python3_version}
-%{python3_sitelib}/pip*
+%if %{defined el6}
+%{_bindir}/pip3
+%endif
+%{_bindir}/pip%{python3_version}
+%{python3_sitelib}/pip
+%{python3_sitelib}/pip-%{version}-py%{python3_version}.egg-info
 %dir %{_datadir}/bash-completion
 %dir %{bash_completion_dir}
+%if %{defined el6}
+%{bash_completion_dir}/pip3
+%endif
 %{bash_completion_dir}/pip%{python3_version}
 
 
 %changelog
 * Sun Sep 22 2019 Carl George <carl@george.computer> - 9.0.1-2
 - Rename to python34-pip
+- Switch to EPEL python3 macros
 
 * Tue Nov 08 2016 Ben Harper <ben.harper@rackspace.com> - 9.0.1.-1.ius
 - Latest upstream
